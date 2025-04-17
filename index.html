@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta Romântica Surpresa</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #ffc0cb;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Container Principal */
+        .main-container {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: calc(100vh - 40px);
+        }
+        
+        /* Envelope - Centralizado verticalmente */
+        .envelope-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .envelope {
+            width: 280px;
+            height: 180px;
+            background-color: #d22d6d;
+            position: relative;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            margin: 20px 0;
+        }
+        
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 90px solid #c01d5d;
+            transform-origin: top;
+            transform: rotateX(0deg);
+            transition: all 0.5s ease;
+            z-index: 3;
+        }
+        
+        .envelope:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-bottom: 90px solid #b00d4d;
+            z-index: 1;
+        }
+        
+        .envelope.open {
+            height: 5px;
+            margin: 0;
+        }
+        
+        .envelope.open:before {
+            transform: rotateX(180deg);
+        }
+        
+        .envelope-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            z-index: 4;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .open-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .open-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Carta */
+        .letter-container {
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            background-color: #000;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.5) translate(-50%, -50%);
+            transition: all 0.8s ease;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            display: none;
+        }
+        
+        .letter-container.show {
+            opacity: 1;
+            transform: scale(1) translate(-50%, -50%);
+            display: block;
+        }
+        
+        .letter-container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.7;
+            border-radius: 15px;
+        }
+        
+        .letter-container h1 {
+            text-align: center;
+            color: #ff69b4;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        
+        .letter-content {
+            line-height: 1.6;
+            font-size: 16px;
+            text-align: justify;
+        }
+        
+        .signature {
+            margin-top: 25px;
+            text-align: right;
+            font-style: italic;
+            color: #ff69b4;
+            font-size: 18px;
+        }
+        
+        /* Corações */
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff69b4;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        /* Botões */
+        .close-btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 10px 20px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .close-btn:hover {
+            background-color: #ff1493;
+            transform: scale(1.05);
+        }
+        
+        /* Player do Spotify */
+        .spotify-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50px;
+            padding: 10px 15px 10px 10px;
+            color: white;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            max-width: calc(100% - 40px);
+        }
+        
+        .spotify-player:hover {
+            background: rgba(30, 30, 30, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .spotify-logo {
+            width: 30px;
+            height: 30px;
+            background-color: #1DB954;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .spotify-text {
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .spotify-subtext {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .envelope {
+                width: 250px;
+                height: 160px;
+            }
+            
+            .envelope:before {
+                border-left: 125px solid transparent;
+                border-right: 125px solid transparent;
+                border-top: 80px solid #c01d5d;
+            }
+            
+            .envelope:after {
+                border-left: 125px solid transparent;
+                border-right: 125px solid transparent;
+                border-bottom: 80px solid #b00d4d;
+            }
+            
+            .letter-container {
+                padding: 20px;
+                width: 95%;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            
+            .letter-container h1 {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+            
+            .letter-content {
+                font-size: 15px;
+                line-height: 1.5;
+            }
+            
+            .spotify-player {
+                padding: 8px 12px 8px 8px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .spotify-text {
+                font-size: 12px;
+            }
+            
+            .spotify-subtext {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Envelope fechado - Centralizado -->
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-text">
+                    Para você, meu amor<br>
+                    <button class="open-btn" id="openBtn">Abrir</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Carta que aparece -->
+        <div class="letter-container" id="letterContainer">
+            <h1>Meu xuxu</h1>
+            
+            <div class="letter-content" id="letterText">
+                <p>Já adianto que como um pessimo poeta sou um ótimo programador.
+                </p>
+                <br>
+                
+                <p>
+                    Rafa, Rafaaaa... Não imaginava estar passando por tudo isso que estou passando agora em questão de sentimos hahah.
+                    Confesso que você chegou de uma forma despretensiosa, e virou uma chave importante no meu dia a dia, sem seu bom dia ou boa noite,
+                    confesso ser estranho passar o dia sem ter sua menssagem.
+                </p>
+                
+                <p>
+                    Por um tempo achei que pelo fato da idade poderia ter barreiras até mesmo para acontecer de ficarmos, porém temos nossas brincadeiras
+                    sobre idade, porém nada foi uma barreira para estarmos como estamos. Enfim, não sou bom com palavras, eu lido com computador e sistemas o dia todo,
+                    não sou muito bom com isso de ser uma pessoa romantica, mas eu tento ao maximo, fazer com que você se sinta bem, confortavel e segura comigo.
+                </p>
+                
+                <p>
+                    Obrigado por tudo até agora! Não sei o que seremos, o que podemos ser, ou se seremos um belo talvez... Mas, saiba que eu estou gostando demais de ter
+                    todo esse tempo com você, as risadas bobas que você tira de mim e que despertou novamente o sentimento de estar gostando de alguém, talvez isso responsa
+                    sua pergunta "Por que tanto tempo solteiro?", ninguém despertou o que sinto HOJE. É tudo simples, porém de coração, acredito que independente do que seremos,
+                    pode contar sempre comigo, você tem minha amizade para sempre disso pode ter total certeza. Será que é cedo pra falar um "Eu to amando sentir isso por você"?
+                </p>
+            </div>
+            
+            <div class="signature">Com todo meu amor,<br><span id="signatureName">Rauan</span></div>
+            
+            <button class="close-btn" id="closeBtn">Fechar Carta</button>
+        </div>
+    </div>
+
+    <!-- Botão do Spotify -->
+    <button class="spotify-player" id="spotifyButton">
+        <div class="spotify-logo">♫</div>
+        <div>
+            <div class="spotify-text">Para você ouvir com carinho meu amor❤️</div>
+            <div class="spotify-subtext">No Spotify</div>
+        </div>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const envelope = document.getElementById('envelope');
+            const envelopeWrapper = document.getElementById('envelopeWrapper');
+            const openBtn = document.getElementById('openBtn');
+            const letterContainer = document.getElementById('letterContainer');
+            const closeBtn = document.getElementById('closeBtn');
+            const spotifyButton = document.getElementById('spotifyButton');
+            
+            // Abrir envelope
+            openBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                envelope.classList.add('open');
+                envelopeWrapper.style.opacity = '0';
+                
+                setTimeout(() => {
+                    letterContainer.classList.add('show');
+                    spotifyButton.style.display = 'flex';
+                    envelopeWrapper.style.display = 'none';
+                }, 500);
+                
+                createHearts();
+            });
+            
+            // Fechar carta
+            closeBtn.addEventListener('click', function() {
+                letterContainer.classList.remove('show');
+                spotifyButton.style.display = 'none';
+                envelopeWrapper.style.display = 'flex';
+                
+                setTimeout(() => {
+                    envelope.classList.remove('open');
+                    envelopeWrapper.style.opacity = '1';
+                }, 300);
+            });
+            
+            // Tornar o texto editável
+            const letterText = document.getElementById('letterText');
+            const signatureName = document.getElementById('signatureName');
+            
+            letterText.addEventListener('click', function() {
+                this.contentEditable = true;
+                this.focus();
+            });
+            
+            signatureName.addEventListener('click', function() {
+                this.contentEditable = true;
+                this.focus();
+            });
+            
+            // Botão do Spotify
+            spotifyButton.addEventListener('click', function() {
+                window.open('https://open.spotify.com/playlist/68CNZt8ZhSOU5jgiT2QsSg?si=b843544adf694200', '_blank');
+            });
+            
+            // Função para criar corações
+            function createHearts() {
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        createHeart();
+                    }, i * 300);
+                }
+            }
+            
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤';
+                heart.classList.add('heart');
+                
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 100 + 'vh';
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                document.body.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
